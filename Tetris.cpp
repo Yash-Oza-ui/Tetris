@@ -18,6 +18,7 @@ int highestScore = 0;
 int difficulty = 5;
 
 void gameLoop();
+
 void displayIntro() {
     cout << "\033[1;36m===============================\033[0m" << endl;
     cout << "\033[1;35m    TEAM AURA++ PRESENTS\033[0m" << endl;
@@ -46,6 +47,7 @@ void saveHighestScore() {
 
 void selectDifficulty() {
     int choice;
+    
     while (true) {
         cout << "\033[1;36m═════════════════════════════════════\033[0m\n";
         cout << "\033[1;33m      Select Difficulty Level\033[0m\n";
@@ -55,11 +57,14 @@ void selectDifficulty() {
         cout << "\033[1;31m3. Hard  (Fast)\033[0m\n";
         cout << "\033[1;36m═════════════════════════════════════\033[0m\n";
         cout << "\033[1;34mEnter choice (1-3): \033[0m";
+
         cin >> choice;
+
         // Check if input is valid
         if (!cin.fail() && (choice >= 1 && choice <= 3)) {
             break; // Valid choice, exit loop
         }
+
         // Clear input buffer and display error message
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -170,9 +175,28 @@ void rotateTetromino() {
     Tetromino temp = currentTetromino;
     temp.shape = rotated;
     
-    if (isValidMove(0, 0)) {
+     bool canRotate = true;
+    for (size_t i = 0; i < temp.shape.size(); i++) {
+        for (size_t j = 0; j < temp.shape[i].size(); j++) {
+            if (temp.shape[i][j]) {
+                int newX = temp.x + j;
+                int newY = temp.y + i;
+
+                // Check if out of bounds or collides with existing blocks
+                if (newX < 0 || newX >= WIDTH || newY >= HEIGHT || (newY >= 0 && board[newY][newX])) {
+                    canRotate = false;
+                    break;
+                }
+            }
+        }
+        if (!canRotate) break;
+    }
+
+    // Apply rotation only if valid
+    if (canRotate) {
         currentTetromino = temp;
     }
+    
 }
 
 void mergeTetromino() {
